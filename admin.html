@@ -320,7 +320,7 @@
                 },
                 // ゲーム枠の削除
                 removeGame(index) {
-                    if (confirm('このゲームを一覧から削除してもよろしいですか？（保存するまで反映されません）')) {
+                    if (confirm('一覧からこのカードを削除します。\n\n※この時点ではまだ消えません。最後に下の「💾 変更をGASに保存する」を押すと完全に削除されます。よろしいですか？')) {
                         this.games.splice(index, 1);
                     }
                 },
@@ -362,8 +362,9 @@
                         if (!response.ok) throw new Error('通信エラー');
                         const result = await response.json();
 
+
                         if (result.status === 'success') {
-                            alert('✅ 保存が完了しました！\nポータルサイトを開き直すと変更が反映されます。');
+                            alert('✅ 保存が完了しました！\n\nポータルサイト（index.html）を開くと、変更や削除が反映されています。\n※もし反映されない場合は、ポータルサイト側で「再読み込み（F5キー）」を何度か試してください。');
                         } else {
                             throw new Error(result.message);
                         }
