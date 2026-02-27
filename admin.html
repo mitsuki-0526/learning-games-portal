@@ -376,10 +376,10 @@
                 }
             },
             mounted() {
-                // URLが保存されていれば自動で読み込む（任意）
-                // if (this.gasUrl) {
-                //     this.fetchData();
-                // }
+                // URLがセットされていれば自動で読み込むフラグ（初回ロードでボタンを押す手間を省く）
+                if (this.gasUrl) {
+                    this.fetchData();
+                }
             }
         }).mount('#app');
     </script>
