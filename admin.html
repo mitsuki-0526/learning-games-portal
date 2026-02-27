@@ -260,9 +260,15 @@
                 <textarea v-model="game.description" placeholder="ゲームのワクワクする説明を書いてください"></textarea>
             </div>
 
-            <div class="form-group">
-                <label>🔗 リンク先URL</label>
-                <input type="text" v-model="game.url" placeholder="https://...">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>🔗 プレイ用URL（生徒用）</label>
+                    <input type="text" v-model="game.url" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                    <label>⚙️ 管理者用URL（先生用）</label>
+                    <input type="text" v-model="game.adminUrl" placeholder="管理画面や設定用のURL（空白可）">
+                </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
@@ -314,6 +320,7 @@
                         grade: '全学年',
                         description: '',
                         url: '',
+                        adminUrl: '',
                         isVisible: true,
                         isNew: false
                     });

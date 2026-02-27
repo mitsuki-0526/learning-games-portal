@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <base target="_top">
+    <title>中学校 学習ゲームポータル (先生用)</title>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-glow: rgba(66, 133, 244, 0.6);
+            --english: #ea4335;
+            --english-glow: rgba(234, 67, 53, 0.6);
+            --japanese: #e53935;
+            --japanese-glow: rgba(229, 57, 53, 0.6);
+            --science: #0f9d58;
+            --science-glow: rgba(15, 157, 88, 0.6);
+            --social: #e67c73;
+            --social-glow: rgba(230, 124, 115, 0.6);
+            --all-sub: #9c27b0;
+            --all-sub-glow: rgba(156, 39, 176, 0.6);
+            --bg-top: #e0f2f1;
+            /* 先生用は少し色味を変える（薄い緑系） */
+            --bg-bottom: #b2dfdb;
+            --text-main: #333;
+            --text-sub: #555;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.6);
+            --badge-bg: #eee;
+            --tab-active-bg: #555;
+            --tab-active-text: #fff;
+        }
+
+        /* ダークモード変数 */
+        [data-theme="dark"] {
+            --primary: #6ba5ff;
+            --primary-glow: rgba(107, 165, 255, 0.8);
+            --english: #ff6b6b;
+            --english-glow: rgba(255, 107, 107, 0.8);
+            --japanese: #ff8a80;
+            --japanese-glow: rgba(255, 138, 128, 0.8);
+            --science: #4ade80;
+            --science-glow: rgba(74, 222, 128, 0.8);
+            --social: #ffb74d;
+            --social-glow: rgba(255, 183, 77, 0.8);
+            --all-sub: #df78ef;
+            --all-sub-glow: rgba(223, 120, 239, 0.8);
+            --bg-top: #00251a;
+            /* ダークモード時も少し緑がかった黒 */
+            --bg-bottom: #004d40;
+            --text-main: #f8fafc;
+            --text-sub: #cbd5e1;
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --badge-bg: #334155;
+            --tab-active-bg: #f8fafc;
+            --tab-active-text: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background: linear-gradient(135deg, var(--bg-top), var(--bg-bottom));
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 動く背景（パーティクル） */
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: var(--primary-glow);
+            filter: blur(40px);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out alternate;
+            opacity: 0.4;
+        }
+
+        .shape:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: -10%;
+            left: -10%;
+            background: rgba(0, 150, 136, 0.4);
+            animation-duration: 20s;
+        }
+
+        .shape:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            bottom: -20%;
+            right: -10%;
+            background: var(--science-glow);
+            animation-duration: 25s;
+        }
+
+        .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 40%;
+            background: rgba(168, 85, 247, 0.4);
+            animation-duration: 18s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(50px, 30px) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+        }
+
+        /* ヘッダー周り */
+        .header-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: transparent;
+            background: linear-gradient(45deg, #00796b, #388e3c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] h1 {
+            background: linear-gradient(45deg, #4db6ac, #81c784);
+            -webkit-background-clip: text;
+            text-shadow: 0px 4px 20px rgba(255, 255, 255, 0.1);
+        }
+
+        header p {
+            font-size: 18px;
+            color: var(--text-sub);
+            font-weight: bold;
+        }
+
+        /* ダークモードトグル */
+        .theme-toggle {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-size: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        /* リンク用ボタン */
+        .btn-portal {
+            position: absolute;
+            top: 0;
+            left: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-portal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* タブ */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn.active {
+            background: var(--tab-active-bg);
+            color: var(--tab-active-text);
+            border-color: transparent;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* グリッドとカード (グラスモーフィズム) */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            border-left: 6px solid #ccc;
+            transform-origin: center bottom;
+        }
+
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            z-index: 10;
+        }
+
+        .card.math {
+            border-left-color: var(--primary);
+        }
+
+        .card.english {
+            border-left-color: var(--english);
+        }
+
+        .card.japanese {
+            border-left-color: var(--japanese);
+        }
+
+        .card.science {
+            border-left-color: var(--science);
+        }
+
+        .card.social {
+            border-left-color: var(--social);
+        }
+
+        .card.all-sub {
+            border-left-color: var(--all-sub);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 900;
+            padding: 5px 10px;
+            border-radius: 8px;
+            background: var(--badge-bg);
+            color: var(--text-sub);
+            letter-spacing: 1px;
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text-main);
+        }
+
+        .card p {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin: 0 0 20px 0;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        /* 先生用ポータルのボタンレイアウト */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .play-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: var(--text-main);
+            color: var(--card-bg);
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        [data-theme="dark"] .play-btn:not(.admin-btn) {
+            color: #0f172a;
+        }
+
+        .card.math .play-btn:not(.admin-btn) {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card.english .play-btn:not(.admin-btn) {
+            background: var(--english);
+            color: white;
+        }
+
+        .card.japanese .play-btn:not(.admin-btn) {
+            background: var(--japanese);
+            color: white;
+        }
+
+        .card.science .play-btn:not(.admin-btn) {
+            background: var(--science);
+            color: white;
+        }
+
+        .card.social .play-btn:not(.admin-btn) {
+            background: var(--social);
+            color: white;
+        }
+
+        .card.all-sub .play-btn:not(.admin-btn) {
+            background: var(--all-sub);
+            color: white;
+        }
+
+        /* 管理ボタン専用スタイル */
+        .admin-btn {
+            background: #607d8b !important;
+            color: white !important;
+        }
+
+        .admin-btn:hover {
+            background: #455a64 !important;
+        }
+
+        [data-theme="dark"] .admin-btn {
+            background: #475569 !important;
+        }
+
+        .play-btn.disabled {
+            background: var(--badge-bg) !important;
+            color: var(--text-sub) !important;
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none;
+        }
+
+        /* アニメーション */
+        .hidden {
+            display: none !important;
+        }
+
+        .card.show-anim {
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* レスポンシブ調整 */
+        @media (max-width: 700px) {
+            .btn-portal {
+                position: static;
+                display: inline-block;
+                margin-bottom: 15px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                position: fixed;
+                z-index: 100;
+            }
+
+            h1 {
+                font-size: 24px;
+                margin-top: 5px;
+            }
+
+            .game-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 背景パーティクル -->
+    <div class="background-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <div class="header-container">
+        <a href="index.html" class="btn-portal">← 生徒用ポータルへ</a>
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="テーマ切り替え">🌙</button>
+        <header>
+            <h1>👨‍🏫 学習ゲームポータル (先生用)</h1>
+            <p>授業でゲームを活用しよう</p>
+        </header>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="filterGames('all', this)">🕹️ すべて</button>
+        <button class="tab-btn" data-category="japanese" onclick="filterGames('japanese', this)">🌸 国語</button>
+        <button class="tab-btn" data-category="math" onclick="filterGames('math', this)">📐 数学</button>
+        <button class="tab-btn" data-category="science" onclick="filterGames('science', this)">🔬 理科</button>
+        <button class="tab-btn" data-category="social" onclick="filterGames('social', this)">🌍 社会</button>
+        <button class="tab-btn" data-category="english" onclick="filterGames('english', this)">🔤 英語</button>
+    </div>
+
+    <div class="game-grid" id="game-grid">
+        <p style="text-align: center; width: 100%; color: var(--text-sub); font-weight: bold; padding: 50px 0;">
+            ⏳ ゲームデータを読み込んでいます...
+        </p>
+    </div>
+
+    <script>
+        // 管理画面のURLも同じGASから取得
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3tGmx08u1BaIyu9PVmg8s5xxQ-xCq-6-Ohlvi-eWo13UZJoMSkxjpA5MlFg7BS-pC/exec';
+        let allGames = [];
+        let currentCategory = 'all';
+
+        window.onload = async () => {
+            initTheme();
+            await fetchGames();
+        };
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle').textContent = '☀️';
+            }
+        }
+
+        function toggleTheme() {
+            const body = document.documentElement;
+            const btn = document.getElementById('theme-toggle');
+
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                btn.textContent = '🌙';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                btn.textContent = '☀️';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        async function fetchGames() {
+            const grid = document.getElementById('game-grid');
+
+            // 先生画面用のキャッシュを別に持つ（設定が違うため）
+            const cachedData = localStorage.getItem('cached_games_teacher');
+            if (cachedData) {
+                try {
+                    allGames = JSON.parse(cachedData);
+                    renderGames();
+                } catch (e) { }
+            }
+
+            try {
+                const response = await fetch(GAS_URL);
+                if (!response.ok) throw new Error('通信エラー');
+                const newData = await response.json();
+
+                const isUpdated = JSON.stringify(allGames) !== JSON.stringify(newData);
+                allGames = newData;
+                localStorage.setItem('cached_games_teacher', JSON.stringify(newData));
+
+                if (!cachedData || isUpdated) {
+                    renderGames();
+                }
+            } catch (error) {
+                console.error('GASの取得に失敗:', error);
+                if (!cachedData) {
+                    grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--english);">データの読み込みに失敗しました。</p>';
+                }
+            }
+        }
+
+        function renderGames() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            const filteredGames = allGames.filter(game => {
+                // 先生用ポータルでは「非公開」のものも薄く表示してあげる（必要なら。今回は除外する）
+                if (game.isVisible === false) return false;
+                if (game.category === 'all-subjects') return true;
+                if (currentCategory === 'all') return true;
+                return game.category === currentCategory;
+            });
+
+            if (filteredGames.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-sub);">このカテゴリのゲームはまだ登録されていません。</p>';
+                return;
+            }
+
+            filteredGames.forEach((game, index) => {
+                let badgeStyle = '';
+                let badgeText = '';
+
+                let playBtnClass = '';
+                let playBtnText = '▶ プレイ';
+                let url = (game.url && game.url.trim() !== '') ? game.url : '#';
+
+                let adminBtnClass = '';
+                let adminUrl = (game.adminUrl && game.adminUrl.trim() !== '') ? game.adminUrl : '#';
+
+                if (url === '#') {
+                    playBtnClass = 'disabled';
+                    playBtnText = '🔧 未実装';
+                }
+
+                if (adminUrl === '#') {
+                    adminBtnClass = 'disabled';
+                }
+
+                switch (game.category) {
+                    case 'math': badgeStyle = 'background:#e3f2fd; color:#1565c0;'; badgeText = '数学'; break;
+                    case 'english': badgeStyle = 'background:#ffebee; color:#c62828;'; badgeText = '英語'; break;
+                    case 'japanese': badgeStyle = 'background:#fce4ec; color:#e53935;'; badgeText = '国語'; break;
+                    case 'science': badgeStyle = 'background:#e8f5e9; color:#0f9d58;'; badgeText = '理科'; break;
+                    case 'social': badgeStyle = 'background:#fbe9e7; color:#e67c73;'; badgeText = '社会'; break;
+                    case 'all-subjects':
+                        badgeStyle = 'background:#f3e5f5; color:#8e24aa; font-weight:900;';
+                        badgeText = '共通ツール';
+                        if (url !== '#') playBtnText = 'JOIN QUIZ';
+                        break;
+                }
+
+                const newBadge = game.isNew ? '<span class="badge" style="background:#ff9800; color:white; margin-left:5px;">NEW!</span>' : '';
+
+                const cardHTML = `
+                    <div class="card ${game.category} show-anim" data-category="${game.category}" style="animation-delay: ${index * 0.05}s">
+                        <div class="card-header">
+                            <div>
+                                <span class="badge">${game.grade || '全学年'}</span>
+                                ${newBadge}
+                            </div>
+                            <span class="badge" style="${badgeStyle}">${badgeText}</span>
+                        </div>
+                        <h2>${game.title}</h2>
+                        <p>${game.description}</p>
+                        
+                        <div class="btn-group">
+                            <a href="${url}" class="play-btn ${playBtnClass}" target="${url === '#' ? '_self' : '_blank'}">${playBtnText}</a>
+                            <a href="${adminUrl}" class="play-btn admin-btn ${adminBtnClass}" target="${adminUrl === '#' ? '_self' : '_blank'}">⚙️ 管理画面</a>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        function filterGames(category, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            currentCategory = category;
+
+            if (allGames.length > 0) {
+                renderGames();
+            }
+        }
+    </script>
+</body>
+
+</html>

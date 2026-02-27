@@ -50,10 +50,17 @@ function getSheet() {
   // シートが存在しなければ作成し、ヘッダー行をセット
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    const headers = ['id', 'category', 'grade', 'title', 'description', 'url', 'isVisible', 'isNew'];
+    const headers = ['id', 'category', 'grade', 'title', 'description', 'url', 'adminUrl', 'isVisible', 'isNew'];
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
     sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
+  } else {
+    // 既存シートの場合、adminUrl列があるか確認し、無ければ一番右に追加
+    const lastCol = sheet.getLastColumn();
+    const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    if (!headers.includes('adminUrl')) {
+      sheet.getRange(1, lastCol + 1).setValue('adminUrl').setFontWeight('bold');
+    }
   }
   return sheet;
 }
@@ -120,11 +127,11 @@ function writeSheetData(sheet, dataArray) {
 // --------------------------------------------------------------------------------
 function initData() {
   const data = [
-    { id: 'game_1', category: 'all-subjects', grade: '全学年・全教科', title: '🚀 Baboot!', description: '黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。', url: 'https://mitsuki-0526.github.io/peerjstest/student.html', isVisible: true, isNew: false },
-    { id: 'game_2', category: 'math', grade: '全学年', title: '⚔️ 数学RPGクエスト', description: '勇者になって問題を解き、魔王を倒そう！セーブ機能付きの本格RPG。', url: '', isVisible: true, isNew: false },
-    { id: 'game_3', category: 'math', grade: '全学年・対戦', title: '🏆 数学グランドバトル', description: '最強の計算王は誰だ！？クラスのみんなと協力して巨大ボスを討伐しよう。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec', isVisible: true, isNew: false },
-    { id: 'game_4', category: 'math', grade: '全学年', title: '💣 方程式ボンバー', description: 'タイムリミットが迫る！瞬時の判断が試されるスリル満点の計算ゲーム。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxMa-mB5nxrKXbwy69iF_l3wSe5-qwqkBQGjDSQdqanE2ghhIY9Kwi8ADBUt5mwBXcO/exec', isVisible: true, isNew: false },
-    { id: 'game_5', category: 'english', grade: '全学年', title: '🔠 Word Guess Game', description: '隠された英単語を推測せよ！3文字・4文字単語のマスターへの道。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxXmb5ppwM2btEiJnCF5Czavp0B8HubVf-ggsPpdPPd4ddJWDCATXZDnoWpJjTE41le/exec', isVisible: true, isNew: false }
+    { id: 'game_1', category: 'all-subjects', grade: '全学年・全教科', title: '🚀 Baboot!', description: '黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。', url: 'https://mitsuki-0526.github.io/peerjstest/student.html', adminUrl: 'https://mitsuki-0526.github.io/peerjstest/teacher.html', isVisible: true, isNew: false },
+    { id: 'game_2', category: 'math', grade: '全学年', title: '⚔️ 数学RPGクエスト', description: '勇者になって問題を解き、魔王を倒そう！セーブ機能付きの本格RPG。', url: '', adminUrl: '', isVisible: true, isNew: false },
+    { id: 'game_3', category: 'math', grade: '全学年・対戦', title: '🏆 数学グランドバトル', description: '最強の計算王は誰だ！？クラスのみんなと協力して巨大ボスを討伐しよう。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec', adminUrl: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec?p=teacher', isVisible: true, isNew: false },
+    { id: 'game_4', category: 'math', grade: '全学年', title: '💣 方程式ボンバー', description: 'タイムリミットが迫る！瞬時の判断が試されるスリル満点の計算ゲーム。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxMa-mB5nxrKXbwy69iF_l3wSe5-qwqkBQGjDSQdqanE2ghhIY9Kwi8ADBUt5mwBXcO/exec', adminUrl: '', isVisible: true, isNew: false },
+    { id: 'game_5', category: 'english', grade: '全学年', title: '🔠 Word Guess Game', description: '隠された英単語を推測せよ！3文字・4文字単語のマスターへの道。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxXmb5ppwM2btEiJnCF5Czavp0B8HubVf-ggsPpdPPd4ddJWDCATXZDnoWpJjTE41le/exec', adminUrl: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxXmb5ppwM2btEiJnCF5Czavp0B8HubVf-ggsPpdPPd4ddJWDCATXZDnoWpJjTE41le/exec?page=admin', isVisible: true, isNew: false }
   ];
   
   const sheet = getSheet();
