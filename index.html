@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4285f4;
+            /* 数学ブルー */
+            --english: #ea4335;
+            /* 英語レッド */
+            --bg: #f0f4f8;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* タブ切り替えボタンのデザイン */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            background: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: 0.3s;
+            color: #666;
+        }
+
+        .tab-btn.active {
+            background: #555;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* 各カテゴリのアクティブ色 */
+        .tab-btn[data-category="math"].active {
+            background: var(--primary);
+        }
+
+        .tab-btn[data-category="english"].active {
+            background: var(--english);
+        }
+
+        /* ゲームカードが並ぶグリッド */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* 個別のカードデザイン */
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 5px solid #ddd;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 教科ごとのボーダー色 */
+        .card.math {
+            border-left-color: var(--primary);
+        }
+
+        .card.english {
+            border-left-color: var(--english);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #eee;
+            color: #555;
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        .play-btn {
+            display: block;
+            text-align: center;
+            background: var(--text);
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .play-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* 未実装ボタンのスタイル */
+        .play-btn.disabled {
+            background: #ccc;
+            color: #fff;
+            cursor: not-allowed;
+            pointer-events: none;
+            /* クリック無効化 */
+            box-shadow: none;
+        }
+
+        /* フィルタリング用の隠すクラス */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>🎮 学習ゲームポータル</h1>
+        <p>遊びながら学ぼう！</p>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="filterGames('all', this)">すべて</button>
+        <button class="tab-btn" data-category="math" onclick="filterGames('math', this)">数学</button>
+        <button class="tab-btn" data-category="english" onclick="filterGames('english', this)">英語</button>
+    </div>
+
+    <div class="game-grid">
+
+        <div class="card math" data-category="math">
+            <div class="card-header">
+                <span class="badge">全学年</span>
+                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
+            </div>
+            <h2>⚔️ 数学RPGクエスト</h2>
+            <p>勇者になって問題を解き、魔王を倒そう！セーブ機能付き。</p>
+            <a href="#" class="play-btn disabled">未実装</a>
+        </div>
+
+        <div class="card math" data-category="math">
+            <div class="card-header">
+                <span class="badge">全学年・対戦</span>
+                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
+            </div>
+            <h2>🏆 数学グランドバトル</h2>
+            <p>最強の計算王は誰だ！？協力してボスを倒そう。</p>
+            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec"
+                class="play-btn" target="_blank">Play</a>
+        </div>
+
+        <div class="card math" data-category="math">
+            <div class="card-header">
+                <span class="badge">全学年</span>
+                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
+            </div>
+            <h2>💣 方程式ボンバー</h2>
+            <p>制限時間内に解け！スリル満点の計算ゲーム。</p>
+            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbxMa-mB5nxrKXbwy69iF_l3wSe5-qwqkBQGjDSQdqanE2ghhIY9Kwi8ADBUt5mwBXcO/exec"
+                class="play-btn" target="_blank">Play</a>
+        </div>
+
+
+        <div class="card english" data-category="english">
+            <div class="card-header">
+                <span class="badge">全学年</span>
+                <span class="badge" style="background:#ffebee; color:#c62828;">英語</span>
+            </div>
+            <h2>🔠 Word Guess Game</h2>
+            <p>隠された英単語を推測しよう。3文字・4文字単語の練習に。</p>
+            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbxXmb5ppwM2btEiJnCF5Czavp0B8HubVf-ggsPpdPPd4ddJWDCATXZDnoWpJjTE41le/exec"
+                class="play-btn" target="_blank">Play</a>
+        </div>
+
+    </div>
+
+    <script>
+        function filterGames(category, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
