@@ -127,7 +127,7 @@ function writeSheetData(sheet, dataArray) {
 // --------------------------------------------------------------------------------
 function initData() {
   const data = [
-    { id: 'game_1', category: 'all-subjects', grade: '全学年・全教科', title: '🚀 Baboot!', description: '黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。', url: 'https://mitsuki-0526.github.io/baboot/student.html', adminUrl: 'https://mitsuki-0526.github.io/baboot/teacher.html', isVisible: true, isNew: false },
+    { id: 'game_1', category: 'all-subjects', grade: '全学年・全教科', title: '🚀 Baboot!', description: '黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。', url: 'https://mitsuki-0526.github.io/baboot/', adminUrl: 'https://mitsuki-0526.github.io/baboot/teacher.html', isVisible: true, isNew: false },
     { id: 'game_2', category: 'math', grade: '全学年', title: '⚔️ 数学RPGクエスト', description: '勇者になって問題を解き、魔王を倒そう！セーブ機能付きの本格RPG。', url: '', adminUrl: '', isVisible: true, isNew: false },
     { id: 'game_3', category: 'math', grade: '全学年・対戦', title: '🏆 数学グランドバトル', description: '最強の計算王は誰だ！？クラスのみんなと協力して巨大ボスを討伐しよう。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec', adminUrl: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec?p=teacher', isVisible: true, isNew: false },
     { id: 'game_4', category: 'math', grade: '全学年', title: '💣 方程式ボンバー', description: 'タイムリミットが迫る！瞬時の判断が試されるスリル満点の計算ゲーム。', url: 'https://script.google.com/a/macros/oskedu.jp/s/AKfycbxMa-mB5nxrKXbwy69iF_l3wSe5-qwqkBQGjDSQdqanE2ghhIY9Kwi8ADBUt5mwBXcO/exec', adminUrl: '', isVisible: true, isNew: false },
