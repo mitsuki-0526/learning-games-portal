@@ -624,15 +624,39 @@
         // ==========================================
         async function fetchGames() {
             const grid = document.getElementById('game-grid');
+
+            // 1. まずブラウザに保存されているデータ（キャッシュ）があれば一瞬で表示する
+            const cachedData = localStorage.getItem('cached_games');
+            if (cachedData) {
+                try {
+                    allGames = JSON.parse(cachedData);
+                    renderGames(); // キャッシュですぐに描画
+                } catch (e) { /* パースエラー時は無視してGASから取得 */ }
+            }
+
+            // 2. 裏側で最新データをGASから取得しにいく
             try {
                 const response = await fetch(GAS_URL);
                 if (!response.ok) throw new Error('通信エラー');
-                const data = await response.json();
-                allGames = data;
-                renderGames();
+                const newData = await response.json();
+
+                // データが更新されているか簡易チェック（文字の長さで比較）
+                const isUpdated = JSON.stringify(allGames) !== JSON.stringify(newData);
+
+                allGames = newData;
+                localStorage.setItem('cached_games', JSON.stringify(newData)); // キャッシュを最新に更新
+
+                // もしキャッシュがなく初めて読むか、データが更新されていたら再描画する
+                if (!cachedData || isUpdated) {
+                    renderGames();
+                }
+
             } catch (error) {
                 console.error('GASの取得に失敗:', error);
-                grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--english);">データの読み込みに失敗しました。</p>';
+                // キャッシュも無い場合はエラー表示
+                if (!cachedData) {
+                    grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--english);">データの読み込みに失敗しました。</p>';
+                }
             }
         }
 
