@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポータルサイト管理画面</title>
+    <!-- Vue.js (CDN) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4285f4;
+            --bg: #f8f9fa;
+            --text: #333;
+            --border: #ddd;
+        }
+
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            color: var(--primary);
+        }
+
+        /* 設定エリア */
+        .setup-area {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 2px dashed var(--primary);
+        }
+
+        .setup-area input {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        /* ゲームリスト */
+        .game-item {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .game-item.invisible {
+            opacity: 0.6;
+            background: #eee;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 60px;
+        }
+
+        /* スイッチ（トグル） */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        /* ボタン類 */
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.8;
+        }
+
+        .btn-success {
+            background: #0f9d58;
+            color: white;
+            font-size: 18px;
+            padding: 12px 24px;
+        }
+
+        .btn-success:hover {
+            background: #0b8043;
+        }
+
+        .btn-danger {
+            background: #ea4335;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53929;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+
+        /* ローディング */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            z-index: 1000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ドラッグハンドル */
+        .drag-handle {
+            cursor: grab;
+            font-size: 20px;
+            color: #999;
+            padding: 5px;
+            text-align: center;
+            background: #eee;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app" class="container">
+        <div :class="['loading-overlay', { hidden: !isLoading }]">
+            ⏳ 通信中...お待ちください...
+        </div>
+
+        <h1>⚙️ ポータルサイト管理画面</h1>
+
+        <div class="setup-area">
+            <label>🔗 GAS WebアプリのURL (データベース)</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" v-model="gasUrl" placeholder="https://script.google.com/macros/s/xxxxxxxx/exec">
+                <button class="btn btn-primary" @click="fetchData" :disabled="!gasUrl">データ読込</button>
+            </div>
+            <p style="font-size:12px; color:#666; margin-top:5px;">※初めて使う時は、GASを発行したURLをここに貼り付けて「データ読込」を押してください。</p>
+        </div>
+
+        <!-- ゲーム一覧がない場合の表示 -->
+        <div v-if="games.length === 0 && gasUrl" style="text-align:center; padding: 40px; color:#888;">
+            <h2>データがありません</h2>
+            <p>「＋ 新しいゲームを追加」ボタンを押してカードを作成してください。</p>
+        </div>
+
+        <!-- ゲーム一覧エディタ -->
+        <div v-for="(game, index) in games" :key="game.id" :class="['game-item', { invisible: !game.isVisible }]">
+            <div class="drag-handle" title="ドラッグして並び替え機能は未実装です">↕ カード No.{{ index + 1 }}</div>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label>タイトル</label>
+                    <input type="text" v-model="game.title" placeholder="例：数学RPGクエスト">
+                </div>
+                <div class="form-group">
+                    <label>教科カテゴリ</label>
+                    <select v-model="game.category">
+                        <option value="all-subjects">共通ツール (全教科)</option>
+                        <option value="japanese">国語</option>
+                        <option value="math">数学</option>
+                        <option value="science">理科</option>
+                        <option value="social">社会</option>
+                        <option value="english">英語</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>対象学年（バッジ）</label>
+                    <input type="text" v-model="game.grade" placeholder="例：中1〜中3">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>説明文（フレーバーテキスト）</label>
+                <textarea v-model="game.description" placeholder="ゲームのワクワクする説明を書いてください"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>🔗 リンク先URL</label>
+                <input type="text" v-model="game.url" placeholder="https://...">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <div class="switch-container">
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" v-model="game.isVisible" style="width:20px; height:20px;">
+                        <span style="margin-left:8px; color: #28a745;" v-if="game.isVisible">👁️ 公開中（サイトに表示する）</span>
+                        <span style="margin-left:8px; color: #dc3545;" v-else>🙈 非公開（サイトから隠す）</span>
+                    </label>
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <label style="display:flex; align-items:center; cursor:pointer;">
+                        <input type="checkbox" v-model="game.isNew" style="width:20px; height:20px;">
+                        <span style="margin-left:8px; color: #ff9800;">✨「NEW!」マークをつける</span>
+                    </label>
+                </div>
+
+                <button class="btn btn-danger" @click="removeGame(index)">🗑️ 削除</button>
+            </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="actions">
+            <button class="btn btn-outline" @click="addGame">＋ 新しいゲームを追加</button>
+            <button class="btn btn-success" @click="saveData" :disabled="games.length === 0 || !gasUrl">💾
+                変更をGASに保存する</button>
+        </div>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    gasUrl: localStorage.getItem('portal_gas_url') || 'https://script.google.com/macros/s/AKfycbw3tGmx08u1BaIyu9PVmg8s5xxQ-xCq-6-Ohlvi-eWo13UZJoMSkxjpA5MlFg7BS-pC/exec',
+                    games: [],
+                    isLoading: false
+                }
+            },
+            methods: {
+                // 新規ゲーム枠の追加
+                addGame() {
+                    const newId = 'game_' + Date.now();
+                    this.games.push({
+                        id: newId,
+                        title: '',
+                        category: 'math',
+                        grade: '全学年',
+                        description: '',
+                        url: '',
+                        isVisible: true,
+                        isNew: false
+                    });
+                },
+                // ゲーム枠の削除
+                removeGame(index) {
+                    if (confirm('このゲームを一覧から削除してもよろしいですか？（保存するまで反映されません）')) {
+                        this.games.splice(index, 1);
+                    }
+                },
+                // GASからデータを取得
+                async fetchData() {
+                    this.isLoading = true;
+                    localStorage.setItem('portal_gas_url', this.gasUrl); // URLを記憶
+
+                    try {
+                        const response = await fetch(this.gasUrl);
+                        if (!response.ok) throw new Error('通信エラー');
+                        const data = await response.json();
+
+                        // シートが空の場合などのフェイルセーフ
+                        if (Array.isArray(data)) {
+                            this.games = data;
+                            alert('データを読み込みました！');
+                        } else {
+                            throw new Error('データの形式が不正です');
+                        }
+                    } catch (error) {
+                        alert('データの取得に失敗しました。\nURLが正しいか、GASが「全員」に公開されているか確認してください。\nエラー: ' + error.message);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                },
+                // GASへデータを保存
+                async saveData() {
+                    this.isLoading = true;
+
+                    try {
+                        const response = await fetch(this.gasUrl, {
+                            method: 'POST',
+                            body: JSON.stringify(this.games),
+                            // GASへのPOSTなので no-cors は使わず、GAS側でリダイレクトを許容する
+                            redirect: 'follow'
+                        });
+
+                        if (!response.ok) throw new Error('通信エラー');
+                        const result = await response.json();
+
+                        if (result.status === 'success') {
+                            alert('✅ 保存が完了しました！\nポータルサイトを開き直すと変更が反映されます。');
+                        } else {
+                            throw new Error(result.message);
+                        }
+                    } catch (error) {
+                        alert('保存に失敗しました。\nエラー: ' + error.message);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                }
+            },
+            mounted() {
+                // URLが保存されていれば自動で読み込む（任意）
+                // if (this.gasUrl) {
+                //     this.fetchData();
+                // }
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+
+</html>

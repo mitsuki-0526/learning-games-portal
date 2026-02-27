@@ -575,88 +575,32 @@
     </div>
 
     <div class="game-grid" id="game-grid">
-
-        <!-- 共通ツール (Baboot!) -->
-        <div class="card all-sub show-anim" data-category="all-subjects">
-            <div class="card-header">
-                <span class="badge" style="background:var(--badge-bg)">全学年・全教科</span>
-                <span class="badge" style="background:#f3e5f5; color:#8e24aa; font-weight:900;">共通ツール</span>
-            </div>
-            <h2>🚀 Baboot!</h2>
-            <p>黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。</p>
-            <a href="https://mitsuki-0526.github.io/peerjstest/student.html" class="play-btn" target="_blank"
-                style="letter-spacing:2px; box-shadow:0 0 10px rgba(0,0,0,0.2);">JOIN QUIZ</a>
-        </div>
-
-        <div class="card math show-anim" data-category="math">
-            <div class="card-header">
-                <span class="badge">全学年</span>
-                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
-            </div>
-            <h2>⚔️ 数学RPGクエスト</h2>
-            <p>勇者になって問題を解き、魔王を倒そう！セーブ機能付きの本格RPG。</p>
-            <a href="#" class="play-btn disabled">🔧 未実装</a>
-        </div>
-
-        <div class="card math show-anim" data-category="math">
-            <div class="card-header">
-                <span class="badge">全学年・対戦</span>
-                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
-            </div>
-            <h2>🏆 数学グランドバトル</h2>
-            <p>最強の計算王は誰だ！？クラスのみんなと協力して巨大ボスを討伐しよう。</p>
-            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbyqULb0iCVWLS2U_BdKwX2fDJhidKrjNuhOYlmixsvqM4LGAnY8T6BVjROddp63VJmm/exec"
-                class="play-btn" target="_blank">PLAY NOW</a>
-        </div>
-
-        <div class="card math show-anim" data-category="math">
-            <div class="card-header">
-                <span class="badge">全学年</span>
-                <span class="badge" style="background:#e3f2fd; color:#1565c0;">数学</span>
-            </div>
-            <h2>💣 方程式ボンバー</h2>
-            <p>タイムリミットが迫る！瞬時の判断が試されるスリル満点の計算ゲーム。</p>
-            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbxMa-mB5nxrKXbwy69iF_l3wSe5-qwqkBQGjDSQdqanE2ghhIY9Kwi8ADBUt5mwBXcO/exec"
-                class="play-btn" target="_blank">PLAY NOW</a>
-        </div>
-
-        <div class="card english show-anim" data-category="english">
-            <div class="card-header">
-                <span class="badge">全学年</span>
-                <span class="badge" style="background:#ffebee; color:#c62828;">英語</span>
-            </div>
-            <h2>🔠 Word Guess Game</h2>
-            <p>隠された英単語を推測せよ！3文字・4文字単語のマスターへの道。</p>
-            <a href="https://script.google.com/a/macros/oskedu.jp/s/AKfycbxXmb5ppwM2btEiJnCF5Czavp0B8HubVf-ggsPpdPPd4ddJWDCATXZDnoWpJjTE41le/exec"
-                class="play-btn" target="_blank">PLAY NOW</a>
-        </div>
-
+        <p style="text-align: center; width: 100%; color: var(--text-sub); font-weight: bold; padding: 50px 0;">
+            ⏳ ゲームデータを読み込んでいます...
+        </p>
     </div>
 
     <script>
-        // タブフィルタリング
-        function filterGames(category, btn) {
-            // アクティブクラスの切り替え
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3tGmx08u1BaIyu9PVmg8s5xxQ-xCq-6-Ohlvi-eWo13UZJoMSkxjpA5MlFg7BS-pC/exec';
+        let allGames = [];
+        let currentCategory = 'all';
 
-            const cards = document.querySelectorAll('.card');
+        // ==========================================
+        // 初期化処理
+        // ==========================================
+        window.onload = async () => {
+            initTheme();
+            await fetchGames();
+        };
 
-            cards.forEach(card => {
-                // 一旦アニメーションクラスを削除して非表示にする
-                card.classList.remove('show-anim');
-                card.classList.add('hidden');
-
-                // 【超重要】 Baboot! (data-category="all-subjects") は常に表示する！
-                // それ以外のカードはカテゴリが一致（または"all"）の場合のみ表示
-                if (category === 'all' || card.dataset.category === category || card.dataset.category === 'all-subjects') {
-                    // setTimeoutを使ってDOMを描画させてからクラスを付与しないとアニメーションが発火しない
-                    setTimeout(() => {
-                        card.classList.remove('hidden');
-                        card.classList.add('show-anim');
-                    }, 10);
-                }
-            });
+        // ダークモード初期化
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('theme-toggle').textContent = '☀️';
+            }
         }
 
         // ダークモード切り替え
@@ -675,17 +619,110 @@
             }
         }
 
-        // ページ読み込み時のテーマ復元
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('theme');
-            // OSのダークモード設定も尊重する
-            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                document.getElementById('theme-toggle').textContent = '☀️';
+        // ==========================================
+        // データ取得と描画
+        // ==========================================
+        async function fetchGames() {
+            const grid = document.getElementById('game-grid');
+            try {
+                const response = await fetch(GAS_URL);
+                if (!response.ok) throw new Error('通信エラー');
+                const data = await response.json();
+                allGames = data;
+                renderGames();
+            } catch (error) {
+                console.error('GASの取得に失敗:', error);
+                grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--english);">データの読み込みに失敗しました。</p>';
             }
-        };
+        }
+
+        function renderGames() {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            // フィルタリング処理
+            const filteredGames = allGames.filter(game => {
+                // 非公開のものは表示しない
+                if (game.isVisible === false) return false;
+
+                // 共通ツールは必ず全タブで表示
+                if (game.category === 'all-subjects') return true;
+
+                // 指定のカテゴリのみ表示
+                if (currentCategory === 'all') return true;
+                return game.category === currentCategory;
+            });
+
+            // 空の場合
+            if (filteredGames.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--text-sub);">このカテゴリのゲームはまだ登録されていません。</p>';
+                return;
+            }
+
+            // HTML生成
+            filteredGames.forEach((game, index) => {
+                let badgeStyle = '';
+                let badgeText = '';
+                let playBtnClass = 'play-btn';
+                let playBtnText = 'PLAY NOW';
+                let url = (game.url && game.url.trim() !== '') ? game.url : '#';
+
+                // 未実装判定
+                if (url === '#') {
+                    playBtnClass = 'play-btn disabled';
+                    playBtnText = '🔧 未実装';
+                }
+
+                // カテゴリカラーとバッジテキスト
+                switch (game.category) {
+                    case 'math': badgeStyle = 'background:#e3f2fd; color:#1565c0;'; badgeText = '数学'; break;
+                    case 'english': badgeStyle = 'background:#ffebee; color:#c62828;'; badgeText = '英語'; break;
+                    case 'japanese': badgeStyle = 'background:#fce4ec; color:#e53935;'; badgeText = '国語'; break;
+                    case 'science': badgeStyle = 'background:#e8f5e9; color:#0f9d58;'; badgeText = '理科'; break;
+                    case 'social': badgeStyle = 'background:#fbe9e7; color:#e67c73;'; badgeText = '社会'; break;
+                    case 'all-subjects':
+                        badgeStyle = 'background:#f3e5f5; color:#8e24aa; font-weight:900;';
+                        badgeText = '共通ツール';
+                        if (url !== '#') playBtnText = 'JOIN QUIZ';
+                        break;
+                }
+
+                // NEWマーク
+                const newBadge = game.isNew ? '<span class="badge" style="background:#ff9800; color:white; margin-left:5px;">NEW!</span>' : '';
+
+                // カードのHTML構成
+                // アニメーションをずらすために animation-delay を設定
+                const cardHTML = `
+                    <div class="card ${game.category} show-anim" data-category="${game.category}" style="animation-delay: ${index * 0.05}s">
+                        <div class="card-header">
+                            <div>
+                                <span class="badge">${game.grade || '全学年'}</span>
+                                ${newBadge}
+                            </div>
+                            <span class="badge" style="${badgeStyle}">${badgeText}</span>
+                        </div>
+                        <h2>${game.title}</h2>
+                        <p>${game.description}</p>
+                        <a href="${url}" class="${playBtnClass}" target="${url === '#' ? '_self' : '_blank'}">${playBtnText}</a>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHTML);
+            });
+        }
+
+        // ==========================================
+        // タブ切り替えのアクション
+        // ==========================================
+        function filterGames(category, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            currentCategory = category;
+
+            if (allGames.length > 0) {
+                renderGames();
+            }
+        }
     </script>
 </body>
 
