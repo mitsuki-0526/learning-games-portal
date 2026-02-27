@@ -14,6 +14,14 @@
             --primary-glow: rgba(66, 133, 244, 0.6);
             --english: #ea4335;
             --english-glow: rgba(234, 67, 53, 0.6);
+            --japanese: #e53935;
+            --japanese-glow: rgba(229, 57, 53, 0.6);
+            --science: #0f9d58;
+            --science-glow: rgba(15, 157, 88, 0.6);
+            --social: #e67c73;
+            --social-glow: rgba(230, 124, 115, 0.6);
+            --all-sub: #9c27b0;
+            --all-sub-glow: rgba(156, 39, 176, 0.6);
             --bg-top: #f0f4f8;
             --bg-bottom: #d9e2ec;
             --text-main: #333;
@@ -31,6 +39,14 @@
             --primary-glow: rgba(107, 165, 255, 0.8);
             --english: #ff6b6b;
             --english-glow: rgba(255, 107, 107, 0.8);
+            --japanese: #ff8a80;
+            --japanese-glow: rgba(255, 138, 128, 0.8);
+            --science: #4ade80;
+            --science-glow: rgba(74, 222, 128, 0.8);
+            --social: #ffb74d;
+            --social-glow: rgba(255, 183, 77, 0.8);
+            --all-sub: #df78ef;
+            --all-sub-glow: rgba(223, 120, 239, 0.8);
             --bg-top: #0f172a;
             --bg-bottom: #1e293b;
             --text-main: #f8fafc;
@@ -223,6 +239,21 @@
             box-shadow: 0 8px 25px var(--english-glow);
         }
 
+        .tab-btn[data-category="japanese"].active {
+            background: linear-gradient(135deg, var(--japanese), #b71c1c);
+            box-shadow: 0 8px 25px var(--japanese-glow);
+        }
+
+        .tab-btn[data-category="science"].active {
+            background: linear-gradient(135deg, var(--science), #0b8043);
+            box-shadow: 0 8px 25px var(--science-glow);
+        }
+
+        .tab-btn[data-category="social"].active {
+            background: linear-gradient(135deg, var(--social), #c53929);
+            box-shadow: 0 8px 25px var(--social-glow);
+        }
+
         /* グリッドとカード (グラスモーフィズム) */
         .game-grid {
             display: grid;
@@ -287,6 +318,22 @@
             border-left-color: var(--english);
         }
 
+        .card.japanese {
+            border-left-color: var(--japanese);
+        }
+
+        .card.science {
+            border-left-color: var(--science);
+        }
+
+        .card.social {
+            border-left-color: var(--social);
+        }
+
+        .card.all-sub {
+            border-left-color: var(--all-sub);
+        }
+
         .card.math:hover {
             border-color: var(--primary);
             box-shadow: 0 15px 35px var(--primary-glow);
@@ -295,6 +342,26 @@
         .card.english:hover {
             border-color: var(--english);
             box-shadow: 0 15px 35px var(--english-glow);
+        }
+
+        .card.japanese:hover {
+            border-color: var(--japanese);
+            box-shadow: 0 15px 35px var(--japanese-glow);
+        }
+
+        .card.science:hover {
+            border-color: var(--science);
+            box-shadow: 0 15px 35px var(--science-glow);
+        }
+
+        .card.social:hover {
+            border-color: var(--social);
+            box-shadow: 0 15px 35px var(--social-glow);
+        }
+
+        .card.all-sub:hover {
+            border-color: var(--all-sub);
+            box-shadow: 0 15px 35px var(--all-sub-glow);
         }
 
         .card-header {
@@ -322,6 +389,26 @@
         [data-theme="dark"] .badge[style*="background:#ffebee"] {
             background: rgba(234, 67, 53, 0.2) !important;
             color: #f28b82 !important;
+        }
+
+        [data-theme="dark"] .badge[style*="background:#fce4ec"] {
+            background: rgba(229, 57, 53, 0.2) !important;
+            color: #ff8a80 !important;
+        }
+
+        [data-theme="dark"] .badge[style*="background:#e8f5e9"] {
+            background: rgba(15, 157, 88, 0.2) !important;
+            color: #4ade80 !important;
+        }
+
+        [data-theme="dark"] .badge[style*="background:#fbe9e7"] {
+            background: rgba(230, 124, 115, 0.2) !important;
+            color: #ffb74d !important;
+        }
+
+        [data-theme="dark"] .badge[style*="background:#f3e5f5"] {
+            background: rgba(156, 39, 176, 0.2) !important;
+            color: #df78ef !important;
         }
 
         .card h2 {
@@ -389,6 +476,26 @@
 
         .card.english .play-btn {
             background: var(--english);
+            color: white;
+        }
+
+        .card.japanese .play-btn {
+            background: var(--japanese);
+            color: white;
+        }
+
+        .card.science .play-btn {
+            background: var(--science);
+            color: white;
+        }
+
+        .card.social .play-btn {
+            background: var(--social);
+            color: white;
+        }
+
+        .card.all-sub .play-btn {
+            background: linear-gradient(45deg, var(--primary), var(--english), var(--science));
             color: white;
         }
 
@@ -460,11 +567,26 @@
 
     <div class="tabs">
         <button class="tab-btn active" onclick="filterGames('all', this)">🕹️ すべて</button>
+        <button class="tab-btn" data-category="japanese" onclick="filterGames('japanese', this)">🌸 国語</button>
         <button class="tab-btn" data-category="math" onclick="filterGames('math', this)">📐 数学</button>
+        <button class="tab-btn" data-category="science" onclick="filterGames('science', this)">🔬 理科</button>
+        <button class="tab-btn" data-category="social" onclick="filterGames('social', this)">🌍 社会</button>
         <button class="tab-btn" data-category="english" onclick="filterGames('english', this)">🔤 英語</button>
     </div>
 
     <div class="game-grid" id="game-grid">
+
+        <!-- 共通ツール (Baboot!) -->
+        <div class="card all-sub show-anim" data-category="all-subjects">
+            <div class="card-header">
+                <span class="badge" style="background:var(--badge-bg)">全学年・全教科</span>
+                <span class="badge" style="background:#f3e5f5; color:#8e24aa; font-weight:900;">共通ツール</span>
+            </div>
+            <h2>🚀 Baboot!</h2>
+            <p>黒板のPINを入力してクイズに参加しよう！スマホ・タブレット対応の早押し対戦アプリ。</p>
+            <a href="https://mitsuki-0526.github.io/peerjstest/student.html" class="play-btn" target="_blank"
+                style="letter-spacing:2px; box-shadow:0 0 10px rgba(0,0,0,0.2);">JOIN QUIZ</a>
+        </div>
 
         <div class="card math show-anim" data-category="math">
             <div class="card-header">
@@ -525,8 +647,9 @@
                 card.classList.remove('show-anim');
                 card.classList.add('hidden');
 
-                // 条件に合うものだけ表示してアニメーション付与
-                if (category === 'all' || card.dataset.category === category) {
+                // 【超重要】 Baboot! (data-category="all-subjects") は常に表示する！
+                // それ以外のカードはカテゴリが一致（または"all"）の場合のみ表示
+                if (category === 'all' || card.dataset.category === category || card.dataset.category === 'all-subjects') {
                     // setTimeoutを使ってDOMを描画させてからクラスを付与しないとアニメーションが発火しない
                     setTimeout(() => {
                         card.classList.remove('hidden');
