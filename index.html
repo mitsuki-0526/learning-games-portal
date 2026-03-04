@@ -732,24 +732,30 @@
 
             // 2. 裏側で最新データをGASから取得しにいく
             try {
-                const response = await fetch(GAS_URL);
+                // キャッシュバスターを追加して常に最新ステータスを確認
+                const response = await fetch(`${GAS_URL}?_t=${Date.now()}`);
                 if (!response.ok) throw new Error('通信エラー');
-                const newData = await response.json();
+                const result = await response.json();
 
-                // データが更新されているか簡易チェック（文字の長さで比較）
-                const isUpdated = JSON.stringify(allGames) !== JSON.stringify(newData);
+                const newData = result.games || [];
+                const newVersion = result.version || 0;
 
-                allGames = newData;
-                localStorage.setItem('cached_games', JSON.stringify(newData)); // キャッシュを最新に更新
+                // ローカルに保存されているバージョンと比較
+                const localVersion = parseInt(localStorage.getItem('cached_version') || '0');
 
-                // もしキャッシュがなく初めて読むか、データが更新されていたら再描画する
-                if (!cachedData || isUpdated) {
+                // データまたはバージョンが更新されているかチェック
+                const isDataChanged = JSON.stringify(allGames) !== JSON.stringify(newData);
+                const isVersionNew = newVersion > localVersion;
+
+                if (isDataChanged || isVersionNew) {
+                    allGames = newData;
+                    localStorage.setItem('cached_games', JSON.stringify(newData));
+                    localStorage.setItem('cached_version', newVersion.toString());
                     renderGames();
                 }
 
             } catch (error) {
                 console.error('GASの取得に失敗:', error);
-                // キャッシュも無い場合はエラー表示
                 if (!cachedData) {
                     grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--english);">データの読み込みに失敗しました。</p>';
                 }

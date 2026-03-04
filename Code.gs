@@ -3,6 +3,7 @@
 // ==========================================
 
 const SHEET_NAME = 'Games'; // データを保存するシート名
+const METADATA_SHEET = 'Metadata'; // バージョン管理用シート
 
 // --------------------------------------------------------------------------------
 // GETリクエスト処理 (データの読み出し)
@@ -11,12 +12,45 @@ const SHEET_NAME = 'Games'; // データを保存するシート名
 function doGet(e) {
   const sheet = getSheet();
   const data = readSheetData(sheet);
+  const version = getVersion();
   
+  const result = {
+    version: version,
+    games: data
+  };
+
   // JSONP または 通常のJSON で返す
-  const output = ContentService.createTextOutput(JSON.stringify(data))
+  const output = ContentService.createTextOutput(JSON.stringify(result))
     .setMimeType(ContentService.MimeType.JSON);
     
   return output;
+}
+
+// --------------------------------------------------------------------------------
+// バージョン取得ヘルパー
+// --------------------------------------------------------------------------------
+function getVersion() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let metaSheet = ss.getSheetByName(METADATA_SHEET);
+  if (!metaSheet) {
+    metaSheet = ss.insertSheet(METADATA_SHEET);
+    metaSheet.getRange(1, 1, 1, 2).setValues([['key', 'value']]);
+    metaSheet.getRange(2, 1, 1, 2).setValues([['version', 1]]);
+    return 1;
+  }
+  const data = metaSheet.getRange(2, 1, 1, 2).getValues();
+  return data[0][1] || 1;
+}
+
+function incrementVersion() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let metaSheet = ss.getSheetByName(METADATA_SHEET);
+  if (!metaSheet) {
+    getVersion(); // シート作成
+    return;
+  }
+  const currentVersion = getVersion();
+  metaSheet.getRange(2, 2).setValue(currentVersion + 1);
 }
 
 // --------------------------------------------------------------------------------
@@ -58,13 +92,18 @@ function getSheet() {
     // 既存シートの場合、必要な列があるか確認し、無ければ一番右に追加
     const lastCol = sheet.getLastColumn();
     const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-    if (!headers.includes('adminUrl')) {
-      sheet.getRange(1, sheet.getLastColumn() + 1).setValue('adminUrl').setFontWeight('bold');
-    }
-    if (!headers.includes('patchNotes')) {
-      sheet.getRange(1, sheet.getLastColumn() + 1).setValue('patchNotes').setFontWeight('bold');
-    }
+    const requiredHeaders = ['adminUrl', 'patchNotes'];
+    
+    requiredHeaders.forEach(h => {
+      if (!headers.includes(h)) {
+        sheet.getRange(1, sheet.getLastColumn() + 1).setValue(h).setFontWeight('bold');
+      }
+    });
   }
+  
+  // Metadataシートの存在も保証
+  getVersion(); 
+  
   return sheet;
 }
 
@@ -123,6 +162,9 @@ function writeSheetData(sheet, dataArray) {
   
 // まとめて書き込み
   sheet.getRange(2, 1, outputValues.length, headers.length).setValues(outputValues);
+
+  // 保存時にバージョンを上げる
+  incrementVersion();
 }
 
 // --------------------------------------------------------------------------------

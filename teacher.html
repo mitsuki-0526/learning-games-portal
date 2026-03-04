@@ -706,15 +706,22 @@
             }
 
             try {
-                const response = await fetch(GAS_URL);
+                // キャッシュバスターを追加
+                const response = await fetch(`${GAS_URL}?_t=${Date.now()}`);
                 if (!response.ok) throw new Error('通信エラー');
-                const newData = await response.json();
+                const result = await response.json();
 
-                const isUpdated = JSON.stringify(allGames) !== JSON.stringify(newData);
-                allGames = newData;
-                localStorage.setItem('cached_games_teacher', JSON.stringify(newData));
+                const newData = result.games || [];
+                const newVersion = result.version || 0;
 
-                if (!cachedData || isUpdated) {
+                const localVersion = parseInt(localStorage.getItem('cached_version_teacher') || '0');
+                const isDataChanged = JSON.stringify(allGames) !== JSON.stringify(newData);
+                const isVersionNew = newVersion > localVersion;
+
+                if (isDataChanged || isVersionNew) {
+                    allGames = newData;
+                    localStorage.setItem('cached_games_teacher', JSON.stringify(newData));
+                    localStorage.setItem('cached_version_teacher', newVersion.toString());
                     renderGames();
                 }
             } catch (error) {
