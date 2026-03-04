@@ -397,7 +397,10 @@
 
                         // シートが空の場合などのフェイルセーフ
                         if (Array.isArray(data)) {
-                            this.games = data;
+                            this.games = data.map(g => ({
+                                ...g,
+                                patchNotes: g.patchNotes || ''
+                            }));
                             if (!isSilent) alert('データを読み込みました！');
                         } else {
                             throw new Error('データの形式が不正です');

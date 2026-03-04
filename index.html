@@ -824,7 +824,7 @@
                         <h2>${game.title}</h2>
                         <p>${game.description}</p>
                         <a href="${url}" class="${playBtnClass}" target="${url === '#' ? '_self' : '_blank'}">${playBtnText}</a>
-                        ${game.patchNotes ? `<button class="patch-btn" onclick="showPatchNotes('${game.id}')">📋 パッチノートを見る</button>` : ''}
+                        ${(game.patchNotes && game.patchNotes.trim()) ? `<button class="patch-btn" onclick="showPatchNotes('${game.id}')">📋 パッチノートを見る</button>` : ''}
                     </div>
                 `;
                 grid.insertAdjacentHTML('beforeend', cardHTML);
