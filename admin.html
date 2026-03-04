@@ -331,6 +331,10 @@
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
                 sessionStorage.setItem('admin_auth', 'true');
+                // VueインスタンスのfetchDataを呼び出す
+                if (window.vm) {
+                    window.vm.fetchData(true);
+                }
             } else {
                 document.getElementById('password-overlay').style.display = 'none';
                 document.getElementById('access-denied').style.display = 'flex';
@@ -345,7 +349,7 @@
             }
         });
 
-        createApp({
+        const app = createApp({
             data() {
                 return {
                     gasUrl: localStorage.getItem('portal_gas_url') || 'https://script.google.com/macros/s/AKfycbw3tGmx08u1BaIyu9PVmg8s5xxQ-xCq-6-Ohlvi-eWo13UZJoMSkxjpA5MlFg7BS-pC/exec',
@@ -376,7 +380,7 @@
                     }
                 },
                 // GASからデータを取得
-                async fetchData() {
+                async fetchData(isSilent = false) {
                     this.isLoading = true;
                     localStorage.setItem('portal_gas_url', this.gasUrl); // URLを記憶
 
@@ -388,7 +392,7 @@
                         // シートが空の場合などのフェイルセーフ
                         if (Array.isArray(data)) {
                             this.games = data;
-                            alert('データを読み込みました！');
+                            if (!isSilent) alert('データを読み込みました！');
                         } else {
                             throw new Error('データの形式が不正です');
                         }
@@ -427,12 +431,13 @@
                 }
             },
             mounted() {
-                // URLがセットされていれば自動で読み込むフラグ（初回ロードでボタンを押す手間を省く）
-                if (this.gasUrl) {
-                    this.fetchData();
+                // URLがセットされており、かつ認証済みの場合のみ自動で読み込む
+                if (this.gasUrl && sessionStorage.getItem('admin_auth') === 'true') {
+                    this.fetchData(true); // 自動読み込み時はサイレント
                 }
             }
-        }).mount('#app');
+        });
+        window.vm = app.mount('#app');
     </script>
 
 </body>
