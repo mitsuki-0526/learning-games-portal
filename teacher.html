@@ -488,31 +488,76 @@
         <div class="shape"></div>
     </div>
 
-    <div class="header-container">
-        <a href="index.html" class="btn-portal">← 生徒用ポータルへ</a>
-        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="テーマ切り替え">🌙</button>
-        <header>
-            <h1>👨‍🏫 学習ゲームポータル (先生用)</h1>
-            <p>授業でゲームを活用しよう</p>
-        </header>
+    <div id="password-overlay"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-top); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+        <div
+            style="background:var(--card-bg); padding:40px; border-radius:20px; border:1px solid var(--card-border); backdrop-filter:blur(10px); box-shadow:0 10px 30px rgba(0,0,0,0.1); max-width:400px; width:100%;">
+            <h2 style="margin-top:0;">🔐 先生用認証</h2>
+            <p style="color:var(--text-sub); margin-bottom:20px;">パスワードを入力してください</p>
+            <input type="password" id="password-input"
+                style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--card-border); background:var(--bg-top); color:var(--text-main); font-size:18px; text-align:center; margin-bottom:20px;"
+                onkeypress="if(event.key==='Enter') verifyPassword()">
+            <button onclick="verifyPassword()"
+                style="width:100%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; font-size:16px;">確認</button>
+            <p id="error-msg" style="color:var(--english); margin-top:20px; font-weight:bold; display:none;">❌
+                パスワードが違います</p>
+        </div>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="filterGames('all', this)">🕹️ すべて</button>
-        <button class="tab-btn" data-category="japanese" onclick="filterGames('japanese', this)">🌸 国語</button>
-        <button class="tab-btn" data-category="math" onclick="filterGames('math', this)">📐 数学</button>
-        <button class="tab-btn" data-category="science" onclick="filterGames('science', this)">🔬 理科</button>
-        <button class="tab-btn" data-category="social" onclick="filterGames('social', this)">🌍 社会</button>
-        <button class="tab-btn" data-category="english" onclick="filterGames('english', this)">🔤 英語</button>
+    <div id="main-content" style="display:none;">
+        <div class="header-container">
+            <a href="index.html" class="btn-portal">← 生徒用ポータルへ</a>
+            <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="テーマ切り替え">🌙</button>
+            <header>
+                <h1>👨‍🏫 学習ゲームポータル (先生用)</h1>
+                <p>授業でゲームを活用しよう</p>
+            </header>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="filterGames('all', this)">🕹️ すべて</button>
+            <button class="tab-btn" data-category="japanese" onclick="filterGames('japanese', this)">🌸 国語</button>
+            <button class="tab-btn" data-category="math" onclick="filterGames('math', this)">📐 数学</button>
+            <button class="tab-btn" data-category="science" onclick="filterGames('science', this)">🔬 理科</button>
+            <button class="tab-btn" data-category="social" onclick="filterGames('social', this)">🌍 社会</button>
+            <button class="tab-btn" data-category="english" onclick="filterGames('english', this)">🔤 英語</button>
+        </div>
+
+        <div class="game-grid" id="game-grid">
+            <p style="text-align: center; width: 100%; color: var(--text-sub); font-weight: bold; padding: 50px 0;">
+                ⏳ ゲームデータを読み込んでいます...
+            </p>
+        </div>
+
+        <footer style="margin-top: 50px; padding: 20px; text-align: center; opacity: 0.3;">
+            <a href="admin.html" style="color: var(--text-sub); text-decoration: none; font-size: 12px;">⚙️ Admin
+                Access</a>
+        </footer>
     </div>
 
-    <div class="game-grid" id="game-grid">
-        <p style="text-align: center; width: 100%; color: var(--text-sub); font-weight: bold; padding: 50px 0;">
-            ⏳ ゲームデータを読み込んでいます...
-        </p>
+    <div id="access-denied"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-top); z-index:9999; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
+        <h1 style="color:var(--english);">アクセスできません</h1>
+        <p>パスワードが正しくありません。</p>
+        <button onclick="location.reload()"
+            style="margin-top:20px; padding:10px 20px; border-radius:8px; border:none; background:var(--primary); color:white; cursor:pointer;">再試行</button>
     </div>
 
     <script>
+        const PASS = 'chikko';
+
+        function verifyPassword() {
+            const input = document.getElementById('password-input').value;
+            if (input === PASS) {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                sessionStorage.setItem('teacher_auth', 'true');
+            } else {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('access-denied').style.display = 'flex';
+            }
+        }
+
         // 管理画面のURLも同じGASから取得
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbw3tGmx08u1BaIyu9PVmg8s5xxQ-xCq-6-Ohlvi-eWo13UZJoMSkxjpA5MlFg7BS-pC/exec';
         let allGames = [];
@@ -520,6 +565,10 @@
 
         window.onload = async () => {
             initTheme();
+            if (sessionStorage.getItem('teacher_auth') === 'true') {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
             await fetchGames();
         };
 
